@@ -49,7 +49,7 @@ public class ResultActivity extends BaseActivity {
     private static final String TAG = "ResultActivity";
     private static final String CHANNEL_ID = "3000";
     private static final int DOWNLOAD_NOTIFICATION_ID_DONE = 911;
-
+    String downloadsDirectoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
     public static void startWithUri(@NonNull Context context, @NonNull Uri uri) {
         Intent intent = new Intent(context, ResultActivity.class);
         intent.setData(uri);
@@ -77,6 +77,7 @@ public class ResultActivity extends BaseActivity {
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(new File(getIntent().getData().getPath()).getAbsolutePath(), options);
 
+
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -96,6 +97,7 @@ public class ResultActivity extends BaseActivity {
         if (item.getItemId() == R.id.menu_download) {
             saveCroppedImage();
 
+
         } else if (item.getItemId() == android.R.id.home) {
             onBackPressed();
         }
@@ -114,6 +116,7 @@ public class ResultActivity extends BaseActivity {
             case REQUEST_STORAGE_WRITE_ACCESS_PERMISSION:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     saveCroppedImage();
+
                 }
                 break;
             default:
@@ -130,8 +133,10 @@ public class ResultActivity extends BaseActivity {
         } else {
             Uri imageUri = getIntent().getData();
             if (imageUri != null && imageUri.getScheme().equals("file")) {
+
                 try {
                     copyFileToDownloads(getIntent().getData());
+
                 } catch (Exception e) {
                     Toast.makeText(ResultActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e(TAG, imageUri.toString(), e);
@@ -142,7 +147,7 @@ public class ResultActivity extends BaseActivity {
         }
     }
 
-    private void copyFileToDownloads(Uri croppedFileUri) throws Exception {
+    public String copyFileToDownloads(Uri croppedFileUri) throws Exception {
         String downloadsDirectoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
         String filename = String.format("%d_%s", Calendar.getInstance().getTimeInMillis(), croppedFileUri.getLastPathSegment());
 
@@ -156,11 +161,38 @@ public class ResultActivity extends BaseActivity {
         inStream.close();
         outStream.close();
 
+        String encodeString = null;
+        try{
+               /* bmp = BitmapFactory.decodeFile(downloadsDirectoryPath);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream .toByteArray();
+                //bmp.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                //bt = bos.toByteArray();
+                encodeString = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                System.out.println("base64--"+encodeString);*/
+
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeFile(saveFile.getAbsolutePath(),bmOptions);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream .toByteArray();
+            encodeString = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            System.out.println("base64--"+encodeString);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
 
 
         showNotification(saveFile);
+
         Toast.makeText(this, R.string.notification_image_saved, Toast.LENGTH_SHORT).show();
+
         finish();
+        return encodeString;
 
     }
 
@@ -222,5 +254,6 @@ public class ResultActivity extends BaseActivity {
         channel.setLightColor(Color.YELLOW);
         return channel;
     }
+
 
 }
