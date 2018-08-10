@@ -18,6 +18,14 @@
     <com.yalantis.ucrop.view.UCropView
         android:id="@+id/ucrop"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="261dp"
+        android:scrollbars="vertical" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="253dp"
+        android:scrollbars="vertical"
+        android:text="base64--" />
 
 </LinearLayout>

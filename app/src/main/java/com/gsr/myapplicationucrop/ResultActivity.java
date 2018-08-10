@@ -22,13 +22,18 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yalantis.ucrop.view.UCropView;
+
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,7 +54,8 @@ public class ResultActivity extends BaseActivity {
     private static final String TAG = "ResultActivity";
     private static final String CHANNEL_ID = "3000";
     private static final int DOWNLOAD_NOTIFICATION_ID_DONE = 911;
-    String downloadsDirectoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+
+
     public static void startWithUri(@NonNull Context context, @NonNull Uri uri) {
         Intent intent = new Intent(context, ResultActivity.class);
         intent.setData(uri);
@@ -60,6 +66,7 @@ public class ResultActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+
         Uri uri = getIntent().getData();
         if (uri != null) {
             try {
@@ -98,8 +105,10 @@ public class ResultActivity extends BaseActivity {
             saveCroppedImage();
 
 
+
         } else if (item.getItemId() == android.R.id.home) {
             onBackPressed();
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -179,6 +188,11 @@ public class ResultActivity extends BaseActivity {
             byte[] byteArray = byteArrayOutputStream .toByteArray();
             encodeString = Base64.encodeToString(byteArray, Base64.DEFAULT);
             System.out.println("base64--"+encodeString);
+            TextView textView=findViewById(R.id.textView);
+            textView.setText(encodeString);
+            textView.setMovementMethod(new ScrollingMovementMethod());
+
+
 
         }catch (Exception e){
             e.printStackTrace();
@@ -191,7 +205,7 @@ public class ResultActivity extends BaseActivity {
 
         Toast.makeText(this, R.string.notification_image_saved, Toast.LENGTH_SHORT).show();
 
-        finish();
+
         return encodeString;
 
     }
@@ -229,6 +243,7 @@ public class ResultActivity extends BaseActivity {
             }
             notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
         } else {
+            //noinspection deprecation
             notificationBuilder = new NotificationCompat.Builder(this);
         }
 
