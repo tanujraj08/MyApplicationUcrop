@@ -45,9 +45,7 @@ import java.util.Random;
 
 import static com.gsr.myapplicationucrop.BuildConfig.*;
 
-/**
- * Created by Oleksii Shliama (https://github.com/shliama).
- */
+
 public class SampleActivity extends BaseActivity implements UCropFragmentCallback {
 
     private static final String TAG = "SampleActivity";

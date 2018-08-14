@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.yalantis.ucrop.view.UCropView;
 
 import org.w3c.dom.Text;
@@ -46,14 +47,18 @@ import java.util.List;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
 
-/**
- * Created by Oleksii Shliama (https://github.com/shliama).
- */
+
 public class ResultActivity extends BaseActivity {
 
     private static final String TAG = "ResultActivity";
     private static final String CHANNEL_ID = "3000";
     private static final int DOWNLOAD_NOTIFICATION_ID_DONE = 911;
+    String downloadsDirectoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+    private Uri croppedFileUri;
+    String filename = String.format("%d_%s", Calendar.getInstance().getTimeInMillis(), croppedFileUri.getLastPathSegment());
+    File saveFile = new File(downloadsDirectoryPath, filename);
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
 
     public static void startWithUri(@NonNull Context context, @NonNull Uri uri) {
@@ -191,6 +196,7 @@ public class ResultActivity extends BaseActivity {
             TextView textView=findViewById(R.id.textView);
             textView.setText(encodeString);
             textView.setMovementMethod(new ScrollingMovementMethod());
+
 
 
 
