@@ -31,7 +31,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.firestore.FirebaseFirestore;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.yalantis.ucrop.view.UCropView;
 
 import org.w3c.dom.Text;
@@ -43,6 +48,7 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
@@ -53,11 +59,11 @@ public class ResultActivity extends BaseActivity {
     private static final String TAG = "ResultActivity";
     private static final String CHANNEL_ID = "3000";
     private static final int DOWNLOAD_NOTIFICATION_ID_DONE = 911;
-    String downloadsDirectoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-    private Uri croppedFileUri;
-    String filename = String.format("%d_%s", Calendar.getInstance().getTimeInMillis(), croppedFileUri.getLastPathSegment());
-    File saveFile = new File(downloadsDirectoryPath, filename);
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+//    String downloadsDirectoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+//    private Uri croppedFileUri;
+//    String filename = String.format("%d_%s", Calendar.getInstance().getTimeInMillis(), croppedFileUri.getLastPathSegment());
+//    File saveFile = new File(downloadsDirectoryPath, filename);
+
 
 
 
@@ -167,6 +173,7 @@ public class ResultActivity extends BaseActivity {
 
         File saveFile = new File(downloadsDirectoryPath, filename);
 
+
         FileInputStream inStream = new FileInputStream(new File(croppedFileUri.getPath()));
         FileOutputStream outStream = new FileOutputStream(saveFile);
         FileChannel inChannel = inStream.getChannel();
@@ -195,10 +202,30 @@ public class ResultActivity extends BaseActivity {
             System.out.println("base64--"+encodeString);
             TextView textView=findViewById(R.id.textView);
             textView.setText(encodeString);
+            Toast.makeText(ResultActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
             textView.setMovementMethod(new ScrollingMovementMethod());
 
+            FirebaseStorage storage;
+            StorageReference storageReference;
+            storage = FirebaseStorage.getInstance();
+            storageReference = storage.getReference();
 
-
+            if(saveFile != null){
+                StorageReference ref = storageReference.child("images/"+ UUID.randomUUID().toString());
+                ref.putFile(Uri.fromFile(saveFile))
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Toast.makeText(ResultActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(ResultActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
 
         }catch (Exception e){
             e.printStackTrace();
